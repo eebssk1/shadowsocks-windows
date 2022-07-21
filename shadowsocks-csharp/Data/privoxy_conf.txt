@@ -4,5 +4,10 @@ logfile ss_privoxy.log
 show-on-task-bar 0
 activity-animation 0
 forward-socks5 / __SOCKS_HOST__:__SOCKS_PORT__ .
-max-client-connections 2048
+max-client-connections 2560
 hide-console
+forwarded-connect-retries 1
+keep-alive-timeout 15
+socket-timeout 30
+listen-backlog 256
+receive-buffer-size 12288
