@@ -8,6 +8,9 @@
 var proxy = __PROXY__;
 var userrules = [];
 var rules = [];
+var sphost = [];
+var types = [];
+const sptypes = ["SOCKS5", "SOCKS4", "SOCKS", "HTTP", "HTTPS"];
 
 // convert to abp grammar
 var re = /^(@@)?\|\|.*?[^\^]$/;
@@ -17,8 +20,21 @@ for (var i = 0; i < __RULES__.length; i++) {
     rules.push(s);
 }
 
+function typebuild(url) {
+    for(var type of sptypes) {
+        if(url.indexOf(' ' + type) !== -1) {
+            url = url.replace(' ' + type, '');
+            sphost.push(url);
+            types.push(type);
+            return url;
+        }
+    }
+    return url;
+}
+
 for (var i = 0; i < __USERRULES__.length; i++) {
     var s = __USERRULES__[i];
+    s = typebuild(s);
     if (s.match(re))  s += "^";
     userrules.push(s);
 }
@@ -803,7 +819,15 @@ var privateNet = [
     ["192.168.0.0", "255.255.0.0"],
 ]
 
+
+function typefixup(host) {
+    const idx = sphost.indexOf(host);
+    if(idx !== -1)
+        proxy = proxy.replace('PROXY',types[idx]);
+}
+
 function FindProxyForURL(url, host) {
+    typefixup(host);
     if (host.match(ip4Re)) {
         for (var i = 0; i < privateNet.length; i++) {
             if (isInNet(host, privateNet[i][0], privateNet[i][1])) return direct;
